@@ -51,10 +51,6 @@ class Choice(urwid.WidgetWrap):
     def item_chosen(self, button):
         if self.caption == u'Exit':
             exit_program("Q")
- #       response = urwid.Text([u'  You chose ', self.caption, u'\n'])
- #       done = MenuButton(u'Ok', exit_program)
- #       response_box = urwid.Filler(urwid.Pile([response, done]))
- #       menu.open_box(urwid.AttrMap(response_box, 'options'))
         for command in consts.RUN_CMD:
             if self.caption == command['title']:
                 subprocess_command(command=command['bash_cmd'])
@@ -141,5 +137,4 @@ if __name__ == "__main__":
         loop.run()
     except BaseException as err:
         with open('errors.txt', 'a') as errors:
-            errors.write(err.message + '\n')
-
+            errors.write(err.message + '\n\n')
