@@ -1,7 +1,7 @@
 import urwid
 import subprocess
 from ScrollText import ExtendedText
-from consts import *
+import consts
 
 
 class MenuButton(urwid.Button):
@@ -35,13 +35,16 @@ class Choice(urwid.WidgetWrap):
 
     def item_chosen(self, button):
         if self.caption == u'Exit':
-            exit_program()
-        response = urwid.Text([u'  You chose ', self.caption, u'\n'])
-        done = MenuButton(u'Ok', exit_program)
-        response_box = urwid.Filler(urwid.Pile([response, done]))
-        menu.open_box(urwid.AttrMap(response_box, 'options'))
-        dummy_cmd = ['ping', '8.8.8.8']
-        subprocess_command(dummy_cmd)
+            exit_program("Q")
+ #       response = urwid.Text([u'  You chose ', self.caption, u'\n'])
+ #       done = MenuButton(u'Ok', exit_program)
+ #       response_box = urwid.Filler(urwid.Pile([response, done]))
+ #       menu.open_box(urwid.AttrMap(response_box, 'options'))
+        for command in consts.RUN_CMD:
+            if self.caption == command['title']:
+                subprocess_command(command=command['bash_cmd'])
+        else:
+            print("command not found")
 
 
 class HorizontalBoxes(urwid.Columns):
@@ -60,27 +63,27 @@ main_menu = SubMenu(u'ATP Test App', [
     SubMenu(u'WTF', [
         Choice(u'Run Wtf Cmd'),
         Choice(u'Help on Wtf'),
-        Choice(u'Back'),
+        Choice(u'Exit'),
     ]),
     SubMenu(u'Aircard Controller PSoc Ver', [
         Choice(u'Run PSoc Ver Test'),
         Choice(u'Help on PSoc Ver'),
-        Choice(u'Back'),
+        Choice(u'Exit'),
     ]),
     SubMenu(u'DC Voltage Check', [
         Choice(u'Run DC Voltage Test'),
         Choice(u'Help on DC Voltage Test'),
-        Choice(u'Back'),
+        Choice(u'Exit'),
     ]),
     SubMenu(u'ARINC429 Loopback Test', [
         Choice(u'Run A429 Loopback Test'),
         Choice(u'Help on A429 Loopback'),
-        Choice(u'Back'),
+        Choice(u'Exit'),
     ]),
     SubMenu(u'Run Automated ATP', [
         Choice(u'Run full ATP'),
         Choice(u'Help on ATP'),
-        Choice(u'Back'),
+        Choice(u'Exit'),
     ]),
     Choice(u'Exit'),
 ])
@@ -110,7 +113,7 @@ def received_output(data):
 
 
 def subprocess_command(command):
-    subprocess.Popen(command, stdout=write_fd, close_fds=True)
+    subprocess.Popen(command, stderr=write_fd, stdout=write_fd, close_fds=True)
 
 
 if __name__ == "__main__":
@@ -131,6 +134,3 @@ if __name__ == "__main__":
 
     loop.widget.original_widget = urwid.Filler(urwid.Columns([menu_frame, subprocess_frame]))
     loop.run()
-
-
-#    urwid.MainLoop(urwid.Filler(top, 'top', 40), palette).run()

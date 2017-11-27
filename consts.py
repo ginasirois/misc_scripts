@@ -2,6 +2,7 @@ import os
 
 
 # BASE Paths
+CURR_DIR = os.path.dirname(__file__)
 LOG_DIR = os.path.join('var', 'log', 'do160', 'txt')
 DO160_DIR = os.path.join('opt', 'do160')
 PROCESS_DIR = os.path.join(DO160_DIR, 'tools', 'process')
@@ -25,7 +26,7 @@ A429_TEST_SCRIPT = os.path.join(DO160_DIR, 'a429_test.sh')
 
 
 # HELP file paths
-HELP_DIR = 'help'
+HELP_DIR = os.path.join(CURR_DIR, 'help')
 HELP_WTF = os.path.join(HELP_DIR, 'wtf.txt')
 HELP_AC_VER = os.path.join(HELP_DIR, 'ac-vers.txt')
 HELP_PSOC_VOLT = os.path.join(HELP_DIR, 'psoc-volt.txt')
@@ -37,32 +38,52 @@ HELP_ATP = os.path.join(HELP_DIR, 'ATP.txt')
 RUN_CMD = [
     {
         'title': 'Run Wtf Cmd',
-        'command': 'wtf | tee -a {0}; test -s {0};'.format(WTF_LOG),
-        'help': HELP_WTF
+        'bash_cmd': ['ping', '8.8.8.8'],
+ #      'bash_cmd': 'wtf | tee -a {0}; test -s {0};'.format(WTF_LOG),
     },
     {
         'title': 'Aircard Controller PSoc Ver',
-        'command': '{0} | tee -a {1}; {2}'.format(GET_VERSION_SCRIPT, VERSION_LOG, AC_VERSION_SCRIPT),
-        'help': HELP_AC_VER
+        'bash_cmd': '{0} | tee -a {1}; {2}'.format(GET_VERSION_SCRIPT, VERSION_LOG, AC_VERSION_SCRIPT),
     },
     {
         'title': 'DC Voltage Check',
-        'command': '{0}| tee -a {1}; {2};'.format(GET_VOLTAGE_SCRIPT, VOLTAGE_LOG, PSOC_VOLT_SCRIPT),
-        'help': HELP_PSOC_VOLT
+        'bash_cmd': '{0} | tee -a {1}; {2};'.format(GET_VOLTAGE_SCRIPT, VOLTAGE_LOG, PSOC_VOLT_SCRIPT),
     },
     {
         'title': 'ARINC429 Loopback Test',
-        'command': '{0} 3 | tee -a {1}; {2};'.format(A429_TEST_SCRIPT, A429_LOG, PROCESS_429_SCRIPT),
-        'help': HELP_429
+        'bash_cmd': '{0} 3 | tee -a {1}; {2};'.format(A429_TEST_SCRIPT, A429_LOG, PROCESS_429_SCRIPT),
     },
     {
         'title': 'Run Automated ATP',
-        'command': '{0}/bin/bats {0}/demo.bats | tee -a ;'.format(BATS_DIR),
-        'help': HELP_ATP
+        'bash_cmd': '{0}/bin/bats {0}/demo.bats | tee -a ;'.format(BATS_DIR),
+    },
+    {
+        'title': 'Help on Wtf Cmd',
+        'bash_cmd': ['cat', '{0}'.format(HELP_WTF)],
+    },
+    {
+        'title': 'Help on PSoc Ver',
+        'bash_cmd': ['cat', '{0}'.format(HELP_AC_VER)],
+    },
+    {
+        'title': 'Help on DC Voltage Test',
+        'bash_cmd': ['cat', '{0}'.format(HELP_PSOC_VOLT)],
+    },
+    {
+        'title': 'Help on A429 Loopback',
+        'bash_cmd': ['cat', '{0}'.format(HELP_429)],
+    },
+    {
+        'title': 'Help on ATP',
+        'bash_cmd': ['cat', '{0}'.format(HELP_ATP)],
     },
     {
         'title': 'Exit',
-        'command': 'Q',
-        'help': ''
+        'bash_cmd': 'Q',
+    },
+    {
+        'title': 'Back',
+        'bash_cmd': 'Q'
     }
 ]
+
