@@ -4,6 +4,21 @@ from ScrollText import ExtendedText
 import consts
 
 
+palette = [
+    (None,  'light gray', 'black'),
+    ('heading', 'black', 'light gray'),
+    ('line', 'black', 'light gray'),
+    ('options', 'dark gray', 'black'),
+    ('focus heading', 'white', 'dark red'),
+    ('focus line', 'black', 'dark red'),
+    ('focus options', 'black', 'light gray'),
+    ('selected', 'white', 'dark red')]
+focus_map = {
+    'heading': 'focus heading',
+    'options': 'focus options',
+    'line': 'focus line'}
+
+
 class MenuButton(urwid.Button):
     def __init__(self, caption, callback):
         super(MenuButton, self).__init__("")
@@ -88,20 +103,6 @@ main_menu = SubMenu(u'ATP Test App', [
     Choice(u'Exit'),
 ])
 
-palette = [
-    (None,  'light gray', 'black'),
-    ('heading', 'black', 'light gray'),
-    ('line', 'black', 'light gray'),
-    ('options', 'dark gray', 'black'),
-    ('focus heading', 'white', 'dark red'),
-    ('focus line', 'black', 'dark red'),
-    ('focus options', 'black', 'light gray'),
-    ('selected', 'white', 'dark red')]
-focus_map = {
-    'heading': 'focus heading',
-    'options': 'focus options',
-    'line': 'focus line'}
-
 
 def exit_program(key):
     raise urwid.ExitMainLoop()
@@ -113,7 +114,10 @@ def received_output(data):
 
 
 def subprocess_command(command):
-    subprocess.Popen(command, stderr=write_fd, stdout=write_fd, close_fds=True)
+    try:
+        subprocess.Popen(command, stderr=write_fd, stdout=write_fd, close_fds=True)
+    except FileNotFoundError:
+        print("file not found")
 
 
 if __name__ == "__main__":
@@ -124,13 +128,18 @@ if __name__ == "__main__":
     menu = HorizontalBoxes()
     menu.open_box(main_menu.menu)
     menu_frame = urwid.BoxAdapter(menu, 90)
-    subprocess_frame = urwid.BoxAdapter(subprocess_widget, 200)
 
+    subprocess_frame = urwid.BoxAdapter(subprocess_widget, 200)
     placeholder = urwid.DARK_BLUE
     loop = urwid.MainLoop(placeholder, palette=palette)
     write_fd = loop.watch_pipe(received_output)
 
     loop.widget = urwid.AttrMap(placeholder, 'bg')
-
     loop.widget.original_widget = urwid.Filler(urwid.Columns([menu_frame, subprocess_frame]))
-    loop.run()
+
+    try:
+        loop.run()
+    except BaseException as err:
+        with open('errors.txt', 'a') as errors:
+            errors.write(err.message + '\n')
+

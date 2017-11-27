@@ -1,4 +1,5 @@
-    Help for ARINC429 Loopback Test 
+
+    Help for ARINC429 Loopback Test
 
 1. Make sure ARINC429 loopback connector
    is in place and connected securely.

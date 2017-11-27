@@ -1,4 +1,5 @@
-    Help for DC VOltage Check
+
+    Help for DC Voltage Check
 
 1. If voltages are out of range,
    run test again.
