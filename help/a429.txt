@@ -1,0 +1,9 @@
+    Help for ARINC429 Loopback Test 
+
+1. Make sure ARINC429 loopback connector
+   is in place and connected securely.
+2. Re-run the ARINC429 Loopback Test.
+3. If the test still fails, the PSoC may
+   be in an invalid state.
+4. Reboot the LRU
+5. Re-run the ARINC429 Loopback Test.

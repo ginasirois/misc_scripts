@@ -1,6 +1,8 @@
 import urwid
 import subprocess
 from ScrollText import ExtendedText
+from consts import *
+
 
 class MenuButton(urwid.Button):
     def __init__(self, caption, callback):
@@ -8,6 +10,7 @@ class MenuButton(urwid.Button):
         urwid.connect_signal(self, 'click', callback)
         self._w = urwid.AttrMap(urwid.SelectableIcon(
             [u'  \N{BULLET} ', caption], 2), None, 'selected')
+
 
 class SubMenu(urwid.WidgetWrap):
     def __init__(self, caption, choices):
@@ -23,6 +26,7 @@ class SubMenu(urwid.WidgetWrap):
     def open_menu(self, button):
         menu.open_box(self.menu)
 
+
 class Choice(urwid.WidgetWrap):
     def __init__(self, caption):
         super(Choice, self).__init__(
@@ -31,11 +35,26 @@ class Choice(urwid.WidgetWrap):
 
     def item_chosen(self, button):
         if self.caption == u'Exit':
-            exit_program
+            exit_program()
         response = urwid.Text([u'  You chose ', self.caption, u'\n'])
         done = MenuButton(u'Ok', exit_program)
         response_box = urwid.Filler(urwid.Pile([response, done]))
         menu.open_box(urwid.AttrMap(response_box, 'options'))
+        dummy_cmd = ['ping', '8.8.8.8']
+        subprocess_command(dummy_cmd)
+
+
+class HorizontalBoxes(urwid.Columns):
+    def __init__(self):
+        super(HorizontalBoxes, self).__init__([], dividechars=1)
+
+    def open_box(self, box):
+        if self.contents:
+            del self.contents[self.focus_position + 1:]
+        self.contents.append((urwid.AttrMap(box, 'options', focus_map),
+            self.options('given', 45)))
+        self.focus_position = len(self.contents) - 1
+
 
 main_menu = SubMenu(u'ATP Test App', [
     SubMenu(u'WTF', [
@@ -80,32 +99,25 @@ focus_map = {
     'options': 'focus options',
     'line': 'focus line'}
 
-class HorizontalBoxes(urwid.Columns):
-    def __init__(self):
-        super(HorizontalBoxes, self).__init__([], dividechars=1)
-
-    def open_box(self, box):
-        if self.contents:
-            del self.contents[self.focus_position + 1:]
-        self.contents.append((urwid.AttrMap(box, 'options', focus_map),
-            self.options('given', 45)))
-        self.focus_position = len(self.contents) - 1
-
-output_widget = ExtendedText("journalctl output of test:\n\n")
 
 def exit_program(key):
     raise urwid.ExitMainLoop()
 
+
 def received_output(data):
     output_widget.set_text(output_widget.text + data)
-#    urwid.connect_signal(output_widget, 'changed', output_widget.update_statusbar)
+#    urwid.connect_signal(output_widget, 'changed', output_widget.set_auto_scroll)
 
-subprocess_widget = urwid.Frame(
-    body=urwid.Filler(output_widget, valign='top', height='flow'),
-    focus_part='body')
+
+def subprocess_command(command):
+    subprocess.Popen(command, stdout=write_fd, close_fds=True)
 
 
 if __name__ == "__main__":
+    output_widget = ExtendedText("journalctl output of test:\n\n")
+    subprocess_widget = urwid.Frame(
+        body=urwid.Filler(output_widget, valign='top', height='flow'),
+        focus_part='body')
     menu = HorizontalBoxes()
     menu.open_box(main_menu.menu)
     menu_frame = urwid.BoxAdapter(menu, 90)
@@ -114,8 +126,7 @@ if __name__ == "__main__":
     placeholder = urwid.DARK_BLUE
     loop = urwid.MainLoop(placeholder, palette=palette)
     write_fd = loop.watch_pipe(received_output)
-    dummy_cmd = ['ping', '8.8.8.8']
-    proc = subprocess.Popen(dummy_cmd, stdout=write_fd, close_fds=True)
+
     loop.widget = urwid.AttrMap(placeholder, 'bg')
 
     loop.widget.original_widget = urwid.Filler(urwid.Columns([menu_frame, subprocess_frame]))

@@ -1,0 +1,12 @@
+	Help for wtf command
+
+1. Make sure the system is ready if
+   the wtf infomation is not complete.
+2. Enter: jag system ready 1
+   On completion, run wtf again
+3. Record the serial number
+4. PSoC version is 0.1.16 or higher
+5. FPGA version is 00000123 or higher
+6. EEPROM checksums match: ee2 and ee4
+7. BIOS versionis CBL6R905 or higher
+8. Verify Software Release Number
