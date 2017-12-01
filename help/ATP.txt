@@ -1,7 +1,0 @@
-
-    Help for Automated Full ATP
-
-1. If any test steps fail, either
-2. See help screens for failing test(s).
-3. Run failing test steps, individually
-4. Or, re-run the full ATP

@@ -1,7 +1,0 @@
-
-    Help for DC Voltage Check
-
-1. If voltages are out of range,
-   run test again.
-2. If values are still out of range
-   scream loudly.
